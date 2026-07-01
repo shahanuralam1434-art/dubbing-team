@@ -100,29 +100,32 @@ export default function Home() {
   const [selectedMember, setSelectedMember] = useState<typeof allMembers[0] | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setUploadedFile(file);
+      setUploadedFile(e.target.files[0]);
+    }
+  };
 
-      // জিমেইলে ফাইল পাঠানোর প্রসেস শুরু
-      const formData = new FormData();
-      formData.append("uploaded_file", file);
+  const handleUploadSubmit = async () => {
+    if (!uploadedFile) return alert("দয়া করে আগে একটি ফাইল সিলেক্ট করুন!");
 
-      try {
-        // নিচে তোমার Formspree থেকে পাওয়া আসল লিংকটি বসাবে
-        await fetch("https://formspree.io/f/xojoklee", {
-          method: "POST",
-          body: formData,
-          headers: {
-            'Accept': 'application/json'
-          }
-        });
-        alert("ভিডিওটি সফলভাবে আপনার জিমেইলে পাঠানো হয়েছে!");
-      } catch (error) {
-        console.error(error);
-        alert("ফাইল পাঠাতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
-      }
+    alert("ভিডিওটি আপলোড হচ্ছে... দয়া করে একটু অপেক্ষা করুন।");
+
+    const formData = new FormData();
+    formData.append("uploaded_file", uploadedFile);
+
+    try {
+      await fetch("https://formspree.io/f/xojoklee", {
+        method: "POST",
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      alert("ভিডিওটি সফলভাবে আপনার জিমেইলে পাঠানো হয়েছে!");
+    } catch (error) {
+      console.error(error);
+      alert("ফাইল পাঠাতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
     }
   };
 
@@ -229,8 +232,20 @@ export default function Home() {
               Selected: {uploadedFile.name} ({(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB)
             </div>
           )}
-        </div>
-      </section>
+    {/* নিচে এই বাটনের কোডটুকু হুবহু পেস্ট করে দাও */}
+    {uploadedFile && (
+      <div className="text-center mt-4">
+        <button 
+          onClick={handleUploadSubmit}
+          className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-xl transition-all"
+        >
+          Send to Gmail
+        </button>
+      </div>
+    )}
+
+  </div>
+</section>
 
       {/* 🌟 PREMIUM POPUP MODAL (ক্লিক করলে সবার ফুল ডিটেইলস দেখাবে) */}
       {selectedMember && (
